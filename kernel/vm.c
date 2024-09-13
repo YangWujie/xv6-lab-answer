@@ -480,6 +480,3 @@ vmprint(pagetable_t pagetable)
   printf("page table %p\n",pagetable);
   dovmprint(pagetable, 0);
 }
-
-
-// https://www.cnblogs.com/diana-learningcpp/p/15579626.html
