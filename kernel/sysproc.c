@@ -75,9 +75,37 @@ int
 sys_pgaccess(void)
 {
   // lab pgtbl: your code here.
+  struct proc *p = myproc();
+  uint64 usrpge_ptr;
+  int npage;
+  uint64 useraddr;
+  argaddr(0, &usrpge_ptr);
+  argint(1, &npage);
+  argaddr(2, &useraddr);
+
+  if(npage > 64) {
+    return -1;
+  }
+
+  uint64 bitmap = 0;
+  uint64 mask = 1;
+  uint64 complement = PTE_A;
+  complement = ~complement;
+  int count = 0;
+  for(uint64 page = usrpge_ptr; page < usrpge_ptr + npage * PGSIZE; page += PGSIZE) {
+    pte_t *pte = walk(p->pagetable, page, 0);
+    if(*pte&PTE_A) {
+      bitmap = bitmap | (mask << count);
+      *pte = (*pte) & complement;
+    }
+    count++;
+  }
+  copyout(p->pagetable, useraddr, (char*)&bitmap, sizeof(bitmap));
+
   return 0;
 }
 #endif
+
 
 uint64
 sys_kill(void)
